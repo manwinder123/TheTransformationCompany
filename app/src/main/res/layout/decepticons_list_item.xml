@@ -15,7 +15,8 @@
 
         <ImageView
             android:layout_width="64dp"
-            android:layout_height="64dp"/>
+            android:layout_height="64dp"
+            android:src="@drawable/decepticon"/>
 
         <TextView
             android:id="@+id/transformer_name_tv"
