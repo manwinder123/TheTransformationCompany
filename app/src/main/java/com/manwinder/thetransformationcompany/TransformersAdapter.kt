@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class TransformersAdapter(private val transformersList: ArrayList<Transformer>) : RecyclerView.Adapter<TransformersAdapter.TransformerHolder>() {
+class TransformersAdapter(private val transformersList: ArrayList<Transformer>, private val clickListener: (Int) -> Unit) : RecyclerView.Adapter<TransformersAdapter.TransformerHolder>() {
 
     override fun getItemViewType(position: Int): Int {
         return if (transformersList[position].transformerType == TransformerType.AUTOBOT) {
@@ -31,11 +31,11 @@ class TransformersAdapter(private val transformersList: ArrayList<Transformer>) 
     }
 
     override fun onBindViewHolder(holder: TransformerHolder, position: Int) {
-        holder.bind(transformersList[position])
+        holder.bind(transformersList[position], clickListener)
     }
 
     class TransformerHolder(private val v: View): RecyclerView.ViewHolder(v) {
-        fun bind(transformerItem: Transformer){
+        fun bind(transformerItem: Transformer, clickListener: (Int) -> Unit){
             v.findViewById<TextView>(R.id.transformer_name_tv).text = transformerItem.name
             v.findViewById<TextView>(R.id.strength_tv).text = "Strength: ${transformerItem.strength.toString()}"
             v.findViewById<TextView>(R.id.intelligence_tv).text = "Intelligence: ${transformerItem.intelligence.toString()}"
@@ -45,6 +45,9 @@ class TransformersAdapter(private val transformersList: ArrayList<Transformer>) 
             v.findViewById<TextView>(R.id.courage_tv).text = "Courage: ${transformerItem.courage.toString()}"
             v.findViewById<TextView>(R.id.firepower_tv).text = "Firepower: ${transformerItem.firePower.toString()}"
             v.findViewById<TextView>(R.id.skill_tv).text = "Skill: ${transformerItem.skill.toString()}"
+            v.setOnClickListener {
+                clickListener(adapterPosition)
+            }
         }
     }
 }

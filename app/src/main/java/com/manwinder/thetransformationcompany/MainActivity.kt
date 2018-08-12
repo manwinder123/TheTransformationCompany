@@ -1,6 +1,8 @@
 package com.manwinder.thetransformationcompany
 
+import android.os.Build
 import android.os.Bundle
+import android.view.Menu
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +13,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
+    private val autobotsList = ArrayList<Transformer>()
+    private val decepticonsList = ArrayList<Transformer>()
     private val transformersList = ArrayList<Transformer>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,11 +24,29 @@ class MainActivity : AppCompatActivity() {
         transformers_rv.addItemDecoration(DividerItemDecoration(transformers_rv.context, DividerItemDecoration.VERTICAL))
 
         transformers_rv.layoutManager = LinearLayoutManager(this)
-        transformers_rv.adapter = TransformersAdapter(transformersList)
+        val transformersAdapter = TransformersAdapter(transformersList) {
+            position -> run {
+                transformersList.removeAt(position)
+                transformers_rv.adapter?.notifyItemRemoved(position)
+            }
+        }
+        transformers_rv.adapter = transformersAdapter
 
         fab.setOnClickListener {
             addTransformerDialog()
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.fight_menu, menu)
+        val fight = menu?.findItem(R.id.fight)
+        fight?.setOnMenuItemClickListener {
+            val fightObj = TransformersFight(autobotsList, decepticonsList)
+            createAlertDialog(fightObj)
+            true
+        }
+        return true
     }
 
     private fun addTransformerDialog() {
@@ -62,6 +84,7 @@ class MainActivity : AppCompatActivity() {
             transformerName?.text?.let {
                 if (it.isEmpty()){
                     transformerName.error = "Transformer name required"
+                    return@setOnClickListener
                 }
             }
 
@@ -72,13 +95,37 @@ class MainActivity : AppCompatActivity() {
 
             val checkedRadioButtonId = radioGroup?.checkedRadioButtonId
 
+            val transformer = Transformer(transformerName?.text.toString(), criteriaVals[0], criteriaVals[1], criteriaVals[2], criteriaVals[3], criteriaVals[4], criteriaVals[5], criteriaVals[6], criteriaVals[7])
+            transformer.setOverallRating()
+
             if (checkedRadioButtonId == R.id.autobot_rb) {
-                transformersList.add(Transformer(TransformerType.AUTOBOT, transformerName?.text.toString(), criteriaVals[0], criteriaVals[1], criteriaVals[2], criteriaVals[3], criteriaVals[4], criteriaVals[5], criteriaVals[6], criteriaVals[7]))
+                transformer.transformerType = TransformerType.AUTOBOT
+                autobotsList.add(transformer)
             } else {
-                transformersList.add(Transformer(TransformerType.DECEPTICON, transformerName?.text.toString(), criteriaVals[0], criteriaVals[1], criteriaVals[2], criteriaVals[3], criteriaVals[4], criteriaVals[5], criteriaVals[6], criteriaVals[7]))
+                transformer.transformerType = TransformerType.DECEPTICON
+                decepticonsList.add(transformer)
             }
+            transformersList.add(transformer)
+
             transformers_rv.adapter?.notifyItemInserted(transformersList.size)
             dialog.dismiss()
         }
+    }
+
+    private fun createAlertDialog(fight: TransformersFight) {
+        val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+        } else {
+            AlertDialog.Builder(this)
+        }
+
+        builder.setTitle("Fight Results")
+                .setMessage("""
+                    ${fight.fightCount} battle${if (fight.fightCount > 1) "s" else ""}
+                    Winning team (${fight.getWinningTeamName()}): ${fight.getWinningTeamMembers()}
+                    Survivors from the losing team (${fight.getLosingTeamName()}): ${fight.getLosingTeamMembersThatSurvived()}
+                """.trimIndent())
+                .setPositiveButton(android.R.string.yes, null)
+                .show()
     }
 }

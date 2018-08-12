@@ -1,8 +1,5 @@
 <resources>
     <string name="app_name">The Transformation Company</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
     <string name="autobot">Autobot</string>
     <string name="decepticon">Decepticon</string>
     <string name="skill">Skill:</string>
@@ -15,4 +12,5 @@
     <string name="add">Add</string>
     <string name="speed">Speed:</string>
     <string name="name">Name</string>
+    <string name="fight">Fight</string>
 </resources>
