@@ -2,7 +2,7 @@ fun main(args ArrayString) {
     println(castleCounter(intArrayOf(0,1,2,2,2,1)))
 }
 
-fun castleCounter(heights IntArray) Int {
+fun castleCounter(heights IntArray): Int {
     if (heights.isEmpty()) {
         return 0
     }
